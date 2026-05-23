@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HumTune - 허밍으로 멜로디 만들기</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffca28">
+    <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>HumTune</h1>
+            <p>허밍으로 나만의 멜로디를 만드세요</p>
+        </header>
+
+        <main>
+            <div class="visualizer-container">
+                <canvas id="visualizer"></canvas>
+                <div id="current-note" class="current-note-display">-</div>
+            </div>
+
+            <div class="controls">
+                <button id="record-btn" class="btn-primary">
+                    <span class="icon">🎤</span>
+                    <span class="text">녹음 시작</span>
+                </button>
+                <button id="play-btn" class="btn-secondary" disabled>
+                    <span class="icon">▶️</span>
+                    <span class="text">재생하기</span>
+                </button>
+            </div>
+
+            <section class="melody-section">
+                <h2>생성된 멜로디</h2>
+                <div id="melody-list" class="melody-list">
+                    <p class="placeholder">허밍을 하면 여기에 계이름이 나타납니다.</p>
+                </div>
+                <button id="clear-btn" class="btn-text">지우기</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>© 2024 HumTune PWA</p>
+        </footer>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://unpkg.com/pitchy@4.0.0/dist/bundle.js"></script>
+    <script src="app.js" defer></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('Service Worker Failed', err));
+            });
+        }
+    </script>
+</body>
+</html>
