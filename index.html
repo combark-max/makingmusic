@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="description" content="SunoAPI로 음악을 생성하는 모바일 스튜디오 앱">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icon-512.png">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Combark's Music</title>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>Combark's Music</h1>
+        </div>
+        <button class="icon-button" id="settingsButton" type="button" aria-label="API 설정 열기" title="API 설정">
+          <span aria-hidden="true">key</span>
+        </button>
+      </header>
+
+      <section class="stage" aria-label="현재 작업">
+        <div class="pulse" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div>
+          <p class="status-label" id="statusLabel">Ready</p>
+          <p class="status-copy" id="statusCopy">프롬프트를 적고 새 트랙을 만들어보세요.</p>
+        </div>
+      </section>
+
+      <form class="composer" id="composerForm">
+        <label class="field span-all">
+          <span>곡 아이디어</span>
+          <textarea id="prompt" maxlength="5000" required placeholder="예: 비 오는 서울 밤, 네온사인, 잔잔한 알앤비와 몽환적인 여성 보컬"></textarea>
+        </label>
+
+        <div class="field">
+          <span>모드</span>
+          <div class="segmented" role="group" aria-label="생성 모드">
+            <label>
+              <input type="radio" name="customMode" value="false" checked>
+              <span>간단</span>
+            </label>
+            <label>
+              <input type="radio" name="customMode" value="true">
+              <span>커스텀</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>모델</span>
+          <select id="model">
+            <option value="V5_5">V5_5</option>
+            <option value="V5" selected>V5</option>
+            <option value="V4_5PLUS">V4_5PLUS</option>
+            <option value="V4_5ALL">V4_5ALL</option>
+            <option value="V4_5">V4_5</option>
+            <option value="V4">V4</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>제목</span>
+          <input id="title" maxlength="100" placeholder="Midnight Seoul">
+        </label>
+
+        <label class="field">
+          <span>스타일</span>
+          <input id="style" maxlength="1000" placeholder="K-R&B, dreamy synth, soft drums">
+        </label>
+
+        <label class="switch span-all">
+          <input id="instrumental" type="checkbox">
+          <span></span>
+          보컬 없이 연주곡으로 생성
+        </label>
+
+        <section class="advanced span-all" aria-label="고급 옵션">
+          <div class="slider-row">
+            <label for="styleWeight">스타일 반영</label>
+            <output id="styleWeightValue">0.65</output>
+            <input id="styleWeight" type="range" min="0" max="1" step="0.01" value="0.65">
+          </div>
+          <div class="slider-row">
+            <label for="weirdness">창의성</label>
+            <output id="weirdnessValue">0.45</output>
+            <input id="weirdness" type="range" min="0" max="1" step="0.01" value="0.45">
+          </div>
+          <label class="field">
+            <span>피하고 싶은 태그</span>
+            <input id="negativeTags" placeholder="harsh noise, metal, distorted vocal">
+          </label>
+          <label class="field">
+            <span>콜백 URL</span>
+            <input id="callbackUrl" type="url" value="https://example.com/callback">
+          </label>
+        </section>
+
+        <button class="generate-button span-all" id="generateButton" type="submit">
+          <span>생성 시작</span>
+          <strong>2 tracks</strong>
+        </button>
+      </form>
+
+      <section class="queue" aria-label="생성 결과">
+        <div class="section-title">
+          <h2>Tracks</h2>
+          <button class="text-button" id="refreshButton" type="button">상태 확인</button>
+        </div>
+        <div class="task-card" id="taskCard" hidden>
+          <div>
+            <p class="task-status" id="taskStatus">PENDING</p>
+            <p class="task-id" id="taskIdText"></p>
+          </div>
+          <div class="meter" aria-hidden="true"><span id="meterBar"></span></div>
+        </div>
+        <div class="tracks" id="tracks">
+          <article class="empty-state">
+            <p>아직 생성된 트랙이 없습니다.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="settings" id="settingsDialog">
+      <form method="dialog">
+        <div class="section-title">
+          <h2>API 설정</h2>
+          <button class="icon-button close" value="cancel" aria-label="닫기" title="닫기">x</button>
+        </div>
+        <label class="field">
+          <span>SunoAPI 키</span>
+          <input id="apiKey" type="password" autocomplete="off" placeholder="Bearer 토큰을 붙여넣기">
+        </label>
+        <label class="switch">
+          <input id="rememberKey" type="checkbox" checked>
+          <span></span>
+          이 기기에 키 저장
+        </label>
+        <menu>
+          <button class="secondary-action" id="clearKeyButton" type="button">키 삭제</button>
+          <button class="primary-action" id="saveKeyButton" value="default">저장</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <template id="trackTemplate">
+      <article class="track">
+        <img alt="" class="cover">
+        <div class="track-body">
+          <h3></h3>
+          <p class="track-meta"></p>
+          <audio controls preload="none"></audio>
+          <details class="lyrics">
+            <summary>가사 보기</summary>
+            <pre></pre>
+          </details>
+          <a class="download" target="_blank" rel="noopener">다운로드</a>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
